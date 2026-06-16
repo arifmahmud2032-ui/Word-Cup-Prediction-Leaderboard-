@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>World Cup Prediction League</title>
+<style>
+body{margin:0;font-family:Arial;background:#f5f5f5}
+.header{background:#0f172a;color:#fff;padding:12px;font-weight:bold}
+.drawer{position:fixed;top:0;left:-240px;width:220px;height:100%;background:#0b2d74;color:#fff;transition:.3s;z-index:1000;padding:15px;box-sizing:border-box}
+.drawer.open{left:0}
+.drawer a{display:block;color:#fff;text-decoration:none;background:rgba(255,255,255,.12);padding:10px;border-radius:8px;margin:8px 0}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999}
+.overlay.show{display:block}
+.page{padding:10px}
+.hidden{display:none}
+table{width:100%;border-collapse:collapse;background:#fff}
+th,td{padding:8px;border-bottom:1px solid #ddd;font-size:13px;text-align:left}
+th{background:#eee}
+.namecell{display:flex;align-items:center;white-space:nowrap}
+.avatar{width:22px;height:22px;border-radius:50%;background:#ddd;object-fit:cover;margin-right:6px}
+input{width:95%;padding:8px;margin:4px 0}
+button{padding:8px 10px;margin:2px}
+</style></head>
+<body>
+<div class="header"><span onclick="toggleMenu()" style="cursor:pointer;font-size:22px">☰</span> 🏆 World Cup Prediction League</div>
+
+<div id="drawer" class="drawer">
+<h3>Menu</h3>
+<a href="#" onclick="showPage('home')">🏆 Leaderboard</a>
+<a href="#" onclick="showPage('players')">👤 Players</a>
+<a href="#" onclick="showPage('prizes')">🎁 Prize Settings</a>
+</div>
+<div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+
+<div id="home" class="page">
+<table>
+<thead><tr><th>Rank</th><th>Name</th><th>Point</th><th>Prize</th></tr></thead>
+<tbody id="board"></tbody>
+</table>
+</div>
+
+<div id="players" class="page hidden">
+<h3>Add Player</h3>
+<input id="newName" placeholder="Player Name">
+<input type="file" id="newPhoto" accept="image/*">
+<button onclick="addPlayer()">Add Player</button>
+<hr>
+<div id="plist"></div>
+</div>
+
+<div id="prizes" class="page hidden">
+<h3>Prize Settings</h3>
+<input id="p1"><input id="p2"><input id="p3"><input id="p4"><input id="p5">
+<button onclick="savePrizes()">Save</button>
+</div>
+
+<input type="file" id="photoEdit" accept="image/*" style="display:none">
+
+<script>
+let players=JSON.parse(localStorage.leaguePlayers||'null')||[
+{name:"Rayhan Uddin",points:200,photo:""},
+{name:"Emon Shehzad",points:190,photo:""},
+{name:"Mirdul Hasan",points:190,photo:""},
+{name:"MD Jobaer Islam",points:180,photo:""},
+{name:"MD Shahadat Hussain",points:180,photo:""},
+{name:"Md Ebrahim Khalil",points:100,photo:""},
+{name:"Saiful Islam Saim",points:100,photo:""},
+{name:"Mobashir Ifti",points:100,photo:""},
+{name:"MD Shahadat Husain",points:90,photo:""},
+{name:"Rasel Mahmud",points:80,photo:""},
+{name:"Aminur Rashid Siam",points:70,photo:""}
+];
+let prizes=JSON.parse(localStorage.leaguePrizes||'["Premium Jersey","2nd Prize","3rd Prize","4th Prize","5th Prize"]');
+
+function save(){localStorage.leaguePlayers=JSON.stringify(players);localStorage.leaguePrizes=JSON.stringify(prizes);}
+
+function render(){
+players.sort((a,b)=>b.points-a.points);
+board.innerHTML="";
+players.forEach((p,i)=>{
+let rank=i==0?'🥇':i==1?'🥈':i==2?'🥉':(i+1);
+let prize=i<5?prizes[i]:'-';
+board.innerHTML+=`<tr>
+<td>${rank}</td>
+<td onclick="editPlayer(${i})"><div class="namecell"><img class="avatar" src="${p.photo||''}">${p.name}</div></td>
+<td>${p.points}</td>
+<td>${prize}</td></tr>`;
+});
+
+plist.innerHTML="";
+players.forEach((p,i)=>{
+plist.innerHTML += `${p.name} (${p.points})
+<button onclick="editPlayer(${i})">✏️</button>
+<button onclick="changePhoto(${i})">🖼️</button>
+<button onclick="deletePlayer(${i})">🗑️</button><br><br>`;
+});
+[p1,p2,p3,p4,p5].forEach((e,i)=>e.value=prizes[i]||'');
+save();
+}
+
+function addPlayer(){
+let n=newName.value.trim(); if(!n) return;
+let f=newPhoto.files[0];
+if(f){let r=new FileReader();r.onload=e=>{players.push({name:n,points:0,photo:e.target.result});render();};r.readAsDataURL(f);}
+else{players.push({name:n,points:0,photo:""});render();}
+}
+function editPlayer(i){
+let n=prompt("Name",players[i].name); if(n!==null) players[i].name=n;
+let p=prompt("Points",players[i].points); if(p!==null) players[i].points=parseInt(p)||0;
+render();
+}
+function deletePlayer(i){if(confirm("Delete player?")){players.splice(i,1);render();}}
+let idx=-1;
+function changePhoto(i){idx=i;photoEdit.click();}
+photoEdit.onchange=function(){let f=this.files[0]; if(!f)return; let r=new FileReader(); r.onload=e=>{players[idx].photo=e.target.result;render();}; r.readAsDataURL(f);}
+function savePrizes(){prizes=[p1.value,p2.value,p3.value,p4.value,p5.value];render();}
+function toggleMenu(){drawer.classList.toggle('open');overlay.classList.toggle('show');}
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');toggleMenu();}
+render();
+</script>
+</body></html>
