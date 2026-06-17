@@ -50,7 +50,7 @@ button{padding:8px 10px;margin:2px}
 
 <div id="prizes" class="page hidden">
 <h3>Prize Settings</h3>
-<input id="p1"><input id="p2"><input id="p3"><input id="p4"><input id="p5">
+<input id="p1"><input id="p2"><input id="p3"><input id="p4"><input id="p5"><input id="p6"><input id="p7"><input id="p8"><input id="p9"><input id="p10">
 <button onclick="savePrizes()">Save</button>
 </div>
 
@@ -70,7 +70,7 @@ let players=JSON.parse(localStorage.leaguePlayers||'null')||[
 {name:"Rasel Mahmud",points:80,photo:""},
 {name:"Aminur Rashid Siam",points:70,photo:""}
 ];
-let prizes=JSON.parse(localStorage.leaguePrizes||'["Premium Jersey","2nd Prize","3rd Prize","4th Prize","5th Prize"]');
+let prizes=JSON.parse(localStorage.leaguePrizes||'["Premium Jersey","2nd Prize","3rd Prize","4th Prize","5th Prize","6th Prize","7th Prize","8th Prize","9th Prize","10th Prize"]');
 
 function save(){localStorage.leaguePlayers=JSON.stringify(players);localStorage.leaguePrizes=JSON.stringify(prizes);}
 
@@ -79,7 +79,7 @@ players.sort((a,b)=>b.points-a.points);
 board.innerHTML="";
 players.forEach((p,i)=>{
 let rank=i==0?'🥇':i==1?'🥈':i==2?'🥉':(i+1);
-let prize=i<5?prizes[i]:'-';
+let prize=i<10?prizes[i]:'-';
 board.innerHTML+=`<tr>
 <td>${rank}</td>
 <td onclick="editPlayer(${i})"><div class="namecell"><img class="avatar" src="${p.photo||''}">${p.name}</div></td>
@@ -94,7 +94,7 @@ plist.innerHTML += `${p.name} (${p.points})
 <button onclick="changePhoto(${i})">🖼️</button>
 <button onclick="deletePlayer(${i})">🗑️</button><br><br>`;
 });
-[p1,p2,p3,p4,p5].forEach((e,i)=>e.value=prizes[i]||'');
+[p1,p2,p3,p4,p5,p6,p7,p8,p9,p10].forEach((e,i)=>e.value=prizes[i]||'');
 save();
 }
 
@@ -113,7 +113,7 @@ function deletePlayer(i){if(confirm("Delete player?")){players.splice(i,1);rende
 let idx=-1;
 function changePhoto(i){idx=i;photoEdit.click();}
 photoEdit.onchange=function(){let f=this.files[0]; if(!f)return; let r=new FileReader(); r.onload=e=>{players[idx].photo=e.target.result;render();}; r.readAsDataURL(f);}
-function savePrizes(){prizes=[p1.value,p2.value,p3.value,p4.value,p5.value];render();}
+function savePrizes(){prizes=[p1.value,p2.value,p3.value,p4.value,p5.value,p6.value,p7.value,p8.value,p9.value,p10.value];render();}
 function toggleMenu(){drawer.classList.toggle('open');overlay.classList.toggle('show');}
 function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');toggleMenu();}
 render();
